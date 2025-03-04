@@ -2,7 +2,7 @@ version: '3.3'
 
 services:
   frontend:
-    image: jirapat66/234-deploylab-frontend-update:latest
+    image: jirapat66/234-deploylab-frontend:latest
     pull_policy: always
     ports:
       - "9999:80"
