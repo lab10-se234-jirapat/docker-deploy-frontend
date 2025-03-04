@@ -33,7 +33,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: jirapat66/234-deploylab-frontend:latest
+          tags: jirapat66/234-deploylab-frontend-update:latest
 
       - name: Copy file via SSH
         uses: appleboy/scp-action@v0.1.7
@@ -42,7 +42,7 @@ jobs:
           username: ${{ secrets.HOST_USER_NAME }}
           key: ${{ secrets.HOST_SSH_PRIVATE_KEY }}
           port: 22
-          source: "docker-compose.yml"
+          source: "docker-compose-prod.yml"
           target: "/home/ubuntu/frontend"
 
       - name: Deploy with Docker Compose
