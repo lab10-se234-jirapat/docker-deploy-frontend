@@ -28,19 +28,15 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      # Step 5: Prepare the docker-compose file
-      - name: Prepare the docker-compose run
-        run: ls -1  # You can replace this with additional setup commands if needed
-
-      # Step 6: Build and push the Docker image to DockerHub
+      # Step 5: Build and push the Docker image to DockerHub
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
           push: true
-          tags: jirapat66/234-deploylab-frontend:latest
+          tags: jirapat66/234-deploylab-frontend-update:latest
 
-      # Step 7: Copy the `docker-compose-prod.yml` file to the server via SSH
+      # Step 6: Copy the docker-compose-prod.yml file to the server via SSH
       - name: Copy file via SSH
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -51,7 +47,7 @@ jobs:
           source: "docker-compose-prod.yml"
           target: "/home/ubuntu/frontend"
 
-      # Step 8: Deploy with Docker Compose
+      # Step 7: Deploy with Docker Compose
       - name: Deploy with Docker Compose
         uses: appleboy/ssh-action@v1.2.1
         with:
@@ -62,7 +58,7 @@ jobs:
           script: |
             cd /home/ubuntu/frontend
             echo ${{ secrets.DOCKER_HUB_TOKEN }} | docker login --username ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
-            docker compose down  # Stops and removes the containers (if they exist)
-            docker compose pull  # Pulls the updated Docker image
-            docker compose up -d  # Starts the updated containers in detached mode
+            docker compose -f docker-compose-prod.yml down  # Stops and removes the containers (if they exist)
+            docker compose -f docker-compose-prod.yml pull  # Pulls the updated Docker image
+            docker compose -f docker-compose-prod.yml up -d  # Starts the new containers on port 9999
             rm -rf /home/ubuntu/frontend  # Removes the files from the server after deployment
