@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - new-frontend-version # Add the new branch
 
 jobs:
   docker:
