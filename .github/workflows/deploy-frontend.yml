@@ -61,4 +61,4 @@ jobs:
             docker compose -f docker-compose-prod.yml down  # Stops and removes the containers (if they exist)
             docker compose -f docker-compose-prod.yml pull  # Pulls the updated Docker image
             docker compose -f docker-compose-prod.yml up -d  # Starts the new containers on port 9999
-           # rm -rf /home/ubuntu/frontend  # Removes the files from the server after deployment
+          # rm -rf /home/ubuntu/frontend  # Removes the files from the server after deployment
