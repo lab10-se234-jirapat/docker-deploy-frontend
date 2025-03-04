@@ -3,31 +3,36 @@ name: Deploy frontend application
 on:
   push:
     branches:
-      - main
-      - new-frontend-version # Add the new branch
+      - new-frontend-version  # Trigger deployment on this branch
 
 jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+      # Step 1: Checkout the code
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Step 2: Set up QEMU (for cross-platform builds)
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
+      # Step 3: Set up Docker Buildx (enables advanced build features)
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      # Step 4: Log in to DockerHub
       - name: Login to DockerHub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
+      # Step 5: Prepare the docker-compose file
       - name: Prepare the docker-compose run
-        run: ls -1
+        run: ls -1  # You can replace this with additional setup commands if needed
 
+      # Step 6: Build and push the Docker image to DockerHub
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -35,6 +40,7 @@ jobs:
           push: true
           tags: jirapat66/234-deploylab-frontend-update:latest
 
+      # Step 7: Copy the `docker-compose-prod.yml` file to the server via SSH
       - name: Copy file via SSH
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -45,6 +51,7 @@ jobs:
           source: "docker-compose-prod.yml"
           target: "/home/ubuntu/frontend"
 
+      # Step 8: Deploy with Docker Compose
       - name: Deploy with Docker Compose
         uses: appleboy/ssh-action@v1.2.1
         with:
@@ -55,7 +62,7 @@ jobs:
           script: |
             cd /home/ubuntu/frontend
             echo ${{ secrets.DOCKER_HUB_TOKEN }} | docker login --username ${{ secrets.DOCKER_HUB_USERNAME }} --password-stdin
-            docker compose down
-            docker compose pull
-            docker compose up -d
-            rm -rf /home/ubuntu/frontend
+            docker compose down  # Stops and removes the containers (if they exist)
+            docker compose pull  # Pulls the updated Docker image
+            docker compose up -d  # Starts the updated containers in detached mode
+            rm -rf /home/ubuntu/frontend  # Removes the files from the server after deployment
